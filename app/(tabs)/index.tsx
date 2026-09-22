@@ -24,6 +24,7 @@ import { CountdownHero } from '../../components/CountdownHero';
 import { ProgressArc } from '../../components/ProgressArc';
 import { ShareModal } from '../../components/ShareModal';
 import { PlateBadge } from '../../components/PlateBadge';
+import { DiaryEntryModal } from '../../components/DiaryEntryModal';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -34,6 +35,7 @@ export default function HomeScreen() {
 
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [shareModalVisible, setShareModalVisible] = useState(false);
+  const [diaryModalVisible, setDiaryModalVisible] = useState(false);
   const appState = useRef(AppState.currentState);
 
   // Canlı saniye sayacı & AppState kontrolü
@@ -106,7 +108,7 @@ export default function HomeScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Üst Marka Başlığı ve Hızlı Paylaş Butonu */}
+        {/* Üst Marka Başlığı, Günlük ve Hızlı Paylaş Butonları */}
         <View style={styles.topBar}>
           <View style={styles.brandContainer}>
             <PlateBadge n={34} size="sm" />
@@ -115,17 +117,45 @@ export default function HomeScreen() {
             </Text>
           </View>
 
-          <TouchableOpacity
-            style={[styles.quickShareBtn, { borderColor: currentColors.line }]}
-            onPress={handleOpenShare}
-            accessibilityLabel={strings.home.shareButton}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.shareIconText}>↗</Text>
-          </TouchableOpacity>
+          <View style={styles.topBarActions}>
+            <TouchableOpacity
+              style={[
+                styles.quickHeaderBtn,
+                {
+                  borderColor: currentColors.line,
+                  backgroundColor: isDark ? 'rgba(243,241,234,0.06)' : '#E2E8F0',
+                },
+              ]}
+              onPress={() => {
+                try {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                } catch {}
+                setDiaryModalVisible(true);
+              }}
+              accessibilityLabel={strings.diary.addNote}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.headerIconText, { color: currentColors.dawn }]}>✍</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.quickHeaderBtn,
+                {
+                  borderColor: currentColors.line,
+                  backgroundColor: isDark ? 'rgba(243,241,234,0.06)' : '#E2E8F0',
+                },
+              ]}
+              onPress={handleOpenShare}
+              accessibilityLabel={strings.home.shareButton}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.headerIconText, { color: currentColors.dawn }]}>↗</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
-        {/* Ortada CountdownHero */}
+        {/* Ortada CountdownHero (Uzun basınca günlük notu açılır) */}
         <View style={styles.heroSection}>
           <CountdownHero
             remainingDays={calculation.remainingDays}
@@ -137,6 +167,12 @@ export default function HomeScreen() {
             seconds={calculation.seconds}
             targetPerson={targetPerson}
             isDark={isDark}
+            onLongPress={() => {
+              try {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              } catch {}
+              setDiaryModalVisible(true);
+            }}
           />
         </View>
 
@@ -154,11 +190,11 @@ export default function HomeScreen() {
         {/* En Altta İki Buton: Paylaş ve Şafak Yolu */}
         <View style={styles.actionButtonsCol}>
           <TouchableOpacity
-            style={[styles.primaryShareBtn, { backgroundColor: currentColors.dawn }]}
+            style={[styles.primaryShareBtn, { backgroundColor: currentColors.primaryBtnBg }]}
             onPress={handleOpenShare}
             activeOpacity={0.85}
           >
-            <Text style={styles.primaryShareBtnText}>
+            <Text style={[styles.primaryShareBtnText, { color: currentColors.primaryBtnText }]}>
               {strings.home.shareButton}
             </Text>
           </TouchableOpacity>
@@ -168,7 +204,7 @@ export default function HomeScreen() {
               styles.secondaryOutlineBtn,
               {
                 borderColor: currentColors.line,
-                backgroundColor: isDark ? 'rgba(243,241,234,0.04)' : 'rgba(0,0,0,0.02)',
+                backgroundColor: isDark ? 'rgba(243,241,234,0.04)' : '#FFFFFF',
               },
             ]}
             onPress={handleOpenSafakYolu}
@@ -180,6 +216,16 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Günlük Girişi Modalı (Hızlı Not) */}
+      <DiaryEntryModal
+        visible={diaryModalVisible}
+        gunNo={Math.max(0, calculation.remainingDays)}
+        tarih={new Date().toISOString().split('T')[0]}
+        plakaIl={calculation.currentIl?.isim}
+        onClose={() => setDiaryModalVisible(false)}
+        isDark={isDark}
+      />
 
       {/* Paylaşım Modalı */}
       <ShareModal
@@ -226,18 +272,21 @@ const styles = StyleSheet.create({
     fontFamily: typography.fonts.condensed.bold,
     letterSpacing: 1,
   },
-  quickShareBtn: {
+  topBarActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  quickHeaderBtn: {
     width: 38,
     height: 38,
     borderRadius: 19,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(243,241,234,0.06)',
   },
-  shareIconText: {
-    fontSize: 18,
-    color: colors.dark.dawn,
+  headerIconText: {
+    fontSize: 16,
     fontWeight: '700',
   },
   heroSection: {
@@ -255,16 +304,15 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#FFD6B0',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 4,
   },
   primaryShareBtnText: {
     fontSize: 17,
     fontFamily: typography.fonts.condensed.bold,
-    color: '#101216',
     letterSpacing: 0.8,
   },
   secondaryOutlineBtn: {

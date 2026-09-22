@@ -5,7 +5,8 @@
 // - done (kalan gün = 0): "Tezkere günü" kutlama mesajı
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { colors } from '../constants/colors';
 import { typography } from '../constants/typography';
 import { strings, TargetPerson } from '../constants/strings';
@@ -22,6 +23,7 @@ interface CountdownHeroProps {
   seconds?: number;
   targetPerson?: TargetPerson;
   isDark?: boolean;
+  onLongPress?: () => void;
 }
 
 export const CountdownHero: React.FC<CountdownHeroProps> = ({
@@ -34,14 +36,15 @@ export const CountdownHero: React.FC<CountdownHeroProps> = ({
   seconds = 0,
   targetPerson = 'self',
   isDark = true,
+  onLongPress,
 }) => {
   const currentColors = isDark ? colors.dark : colors.light;
 
   if (heroState === 'done') {
     return (
       <View style={styles.container}>
-        <View style={[styles.celebrationBadge, { backgroundColor: currentColors.dawn }]}>
-          <Text style={styles.celebrationBadgeText}>
+        <View style={[styles.celebrationBadge, { backgroundColor: currentColors.primaryBtnBg }]}>
+          <Text style={[styles.celebrationBadgeText, { color: currentColors.primaryBtnText }]}>
             {strings.home.doneBadge}
           </Text>
         </View>
@@ -87,10 +90,19 @@ export const CountdownHero: React.FC<CountdownHeroProps> = ({
           {strings.home.relativeRemaining(targetPerson)}
         </Text>
 
-        {/* Plaka Rozeti */}
-        <View style={styles.plateWrapper}>
+        {/* Plaka Rozeti (Uzun basınca günlüğe not düşer) */}
+        <TouchableOpacity
+          onLongPress={() => {
+            try {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            } catch {}
+            if (onLongPress) onLongPress();
+          }}
+          activeOpacity={0.85}
+          style={styles.plateWrapper}
+        >
           <PlateBadge n={plateNumber} size="hero" cityName={ilAdi} />
-        </View>
+        </TouchableOpacity>
 
         {/* İl Adı */}
         <Text
@@ -119,7 +131,12 @@ export const CountdownHero: React.FC<CountdownHeroProps> = ({
         </Text>
 
         {/* Canlı Saat / Dakika / Saniye Sayacı */}
-        <View style={styles.timerRow}>
+        <View
+          style={[
+            styles.timerRow,
+            { backgroundColor: isDark ? 'rgba(243,241,234,0.06)' : '#E2E8F0' },
+          ]}
+        >
           <Text
             style={[
               styles.timerDigits,
@@ -151,18 +168,28 @@ export const CountdownHero: React.FC<CountdownHeroProps> = ({
         {strings.home.relativeRemaining(targetPerson)}
       </Text>
 
-      {/* Büyük Gün Sayısı: 112px */}
-      <Text
-        style={[
-          styles.heroDays,
-          {
-            color: currentColors.ink,
-            fontFamily: typography.fonts.condensed.bold,
-          },
-        ]}
+      {/* Büyük Gün Sayısı: 112px (Uzun basınca günlüğe not düşer) */}
+      <TouchableOpacity
+        onLongPress={() => {
+          try {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          } catch {}
+          if (onLongPress) onLongPress();
+        }}
+        activeOpacity={0.85}
       >
-        {remainingDays}
-      </Text>
+        <Text
+          style={[
+            styles.heroDays,
+            {
+              color: currentColors.ink,
+              fontFamily: typography.fonts.condensed.bold,
+            },
+          ]}
+        >
+          {remainingDays}
+        </Text>
+      </TouchableOpacity>
 
       {/* Gün Kaldı Etiketi */}
       <Text

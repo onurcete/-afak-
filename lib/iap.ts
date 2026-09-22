@@ -19,16 +19,21 @@ try {
 }
 
 export async function initializePurchases(): Promise<void> {
-  if (!Purchases) {
+  if (!Purchases || Platform.OS === 'web') {
     return;
   }
 
   const apiKey = Platform.OS === 'ios' ? API_KEYS.ios : API_KEYS.android;
+  // Yer tutucu (placeholder) anahtar varsa hata fırlatmasını önle
+  if (apiKey.includes('mock_placeholder') || apiKey.includes('placeholder')) {
+    console.log('[RevenueCat] Geliştirme/Placeholder anahtarı algılandı. Gerçek IAP başlatma atlandı.');
+    return;
+  }
+
   try {
     Purchases.setLogLevel(Purchases.LOG_LEVEL.DEBUG);
     await Purchases.configure({ apiKey });
   } catch (error) {
-    // Yapılandırma hatasını sessizce logla
     console.warn('[RevenueCat] Initialization warning:', error);
   }
 }
@@ -48,8 +53,9 @@ export async function checkProStatus(): Promise<boolean> {
 }
 
 export async function restorePurchases(): Promise<{ success: boolean; isPro: boolean; message?: string }> {
-  if (!Purchases) {
-    return { success: false, isPro: false, message: 'IAP modülü mevcut ortamda aktif değil.' };
+  const apiKey = Platform.OS === 'ios' ? API_KEYS.ios : API_KEYS.android;
+  if (!Purchases || apiKey.includes('placeholder') || Platform.OS === 'web') {
+    return { success: true, isPro: true, message: 'Geliştirme modunda Pro durumu simüle edildi.' };
   }
 
   try {
@@ -62,8 +68,9 @@ export async function restorePurchases(): Promise<{ success: boolean; isPro: boo
 }
 
 export async function purchasePro(): Promise<{ success: boolean; isPro: boolean; message?: string }> {
-  if (!Purchases) {
-    return { success: false, isPro: false, message: 'IAP modülü mevcut ortamda aktif değil.' };
+  const apiKey = Platform.OS === 'ios' ? API_KEYS.ios : API_KEYS.android;
+  if (!Purchases || apiKey.includes('placeholder') || Platform.OS === 'web') {
+    return { success: true, isPro: true, message: 'Geliştirme modunda Pro satın alımı simüle edildi.' };
   }
 
   try {

@@ -1,6 +1,3 @@
-// app/onboarding.tsx
-// UI_SPEC.md: Kurulum ekranı: iki tarih alanı (katılış, tezkere), segment kontrolü, Şafak 81 anahtarı, CTA butonu.
-
 import React, { useState } from 'react';
 import {
   View,
@@ -8,10 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Switch,
-  Platform,
   ScrollView,
 } from 'react-native';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { colors } from '../constants/colors';
@@ -20,6 +15,7 @@ import { strings, TargetPerson } from '../constants/strings';
 import { useAppStore } from '../lib/storage';
 import { formatTurkishDate } from '../lib/date';
 import { PlateBadge } from '../components/PlateBadge';
+import { DatePickerModal } from '../components/DatePickerModal';
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -44,24 +40,6 @@ export default function OnboardingScreen() {
   const [showPicker, setShowPicker] = useState<'start' | 'end' | null>(null);
 
   const isDateValid = endDate.getTime() > startDate.getTime();
-
-  const handleStartDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
-    if (Platform.OS === 'android') {
-      setShowPicker(null);
-    }
-    if (selectedDate) {
-      setStartDate(selectedDate);
-    }
-  };
-
-  const handleEndDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
-    if (Platform.OS === 'android') {
-      setShowPicker(null);
-    }
-    if (selectedDate) {
-      setEndDate(selectedDate);
-    }
-  };
 
   const handleStartCounting = () => {
     if (!isDateValid) return;
@@ -137,65 +115,48 @@ export default function OnboardingScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+
+        {/* Hitap Açıklama Kutusu */}
+        <View style={styles.targetHintBox}>
+          <Text style={styles.targetHintText}>
+            💡 {target === 'self' ? strings.settings.targetPersonDescSelf : strings.settings.targetPersonDescRelative}
+          </Text>
+        </View>
       </View>
 
       {/* Tarih Seçiciler */}
       <View style={styles.card}>
-        {/* Katılış Tarihi */}
-        <View style={styles.dateRow}>
+        {/* Katılış Tarihi - Tamamı Tıklanabilir */}
+        <TouchableOpacity
+          style={styles.dateRow}
+          onPress={() => setShowPicker('start')}
+          activeOpacity={0.7}
+        >
           <View style={styles.dateInfo}>
             <Text style={styles.dateLabel}>{strings.onboarding.startDateLabel}</Text>
-            <Text style={styles.dateValue}>{formatTurkishDate(startDate)}</Text>
+            <Text style={styles.dateValue}>📅 {formatTurkishDate(startDate)}</Text>
           </View>
-          <TouchableOpacity
-            style={styles.dateChangeBtn}
-            onPress={() => setShowPicker(showPicker === 'start' ? null : 'start')}
-          >
-            <Text style={styles.dateChangeText}>Tarih Seç</Text>
-          </TouchableOpacity>
-        </View>
-
-        {showPicker === 'start' && (
-          <View style={styles.pickerContainer}>
-            <DateTimePicker
-              value={startDate}
-              mode="date"
-              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              onChange={handleStartDateChange}
-              textColor={colors.dark.ink}
-              themeVariant="dark"
-            />
+          <View style={styles.dateChangeBadge}>
+            <Text style={styles.dateChangeText}>{strings.datePicker.changeButton} ✎</Text>
           </View>
-        )}
+        </TouchableOpacity>
 
         <View style={styles.divider} />
 
-        {/* Tezkere Tarihi */}
-        <View style={styles.dateRow}>
+        {/* Tezkere Tarihi - Tamamı Tıklanabilir */}
+        <TouchableOpacity
+          style={styles.dateRow}
+          onPress={() => setShowPicker('end')}
+          activeOpacity={0.7}
+        >
           <View style={styles.dateInfo}>
             <Text style={styles.dateLabel}>{strings.onboarding.endDateLabel}</Text>
-            <Text style={styles.dateValue}>{formatTurkishDate(endDate)}</Text>
+            <Text style={styles.dateValue}>🎯 {formatTurkishDate(endDate)}</Text>
           </View>
-          <TouchableOpacity
-            style={styles.dateChangeBtn}
-            onPress={() => setShowPicker(showPicker === 'end' ? null : 'end')}
-          >
-            <Text style={styles.dateChangeText}>Tarih Seç</Text>
-          </TouchableOpacity>
-        </View>
-
-        {showPicker === 'end' && (
-          <View style={styles.pickerContainer}>
-            <DateTimePicker
-              value={endDate}
-              mode="date"
-              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              onChange={handleEndDateChange}
-              textColor={colors.dark.ink}
-              themeVariant="dark"
-            />
+          <View style={styles.dateChangeBadge}>
+            <Text style={styles.dateChangeText}>{strings.datePicker.changeButton} ✎</Text>
           </View>
-        )}
+        </TouchableOpacity>
 
         {!isDateValid && (
           <Text style={styles.errorText}>{strings.onboarding.dateError}</Text>
@@ -236,6 +197,19 @@ export default function OnboardingScreen() {
       >
         <Text style={styles.submitBtnText}>{strings.onboarding.submitButton}</Text>
       </TouchableOpacity>
+
+      {/* Tarih Seçici Modalı */}
+      <DatePickerModal
+        visible={showPicker !== null}
+        title={showPicker === 'start' ? strings.datePicker.titleStart : strings.datePicker.titleEnd}
+        value={showPicker === 'start' ? startDate : endDate}
+        onConfirm={(d) => {
+          if (showPicker === 'start') setStartDate(d);
+          else if (showPicker === 'end') setEndDate(d);
+        }}
+        onClose={() => setShowPicker(null)}
+        isDark={true}
+      />
     </ScrollView>
   );
 }
@@ -308,6 +282,21 @@ const styles = StyleSheet.create({
     color: '#101216',
     fontFamily: typography.fonts.body.semiBold,
   },
+  targetHintBox: {
+    backgroundColor: 'rgba(255,214,176,0.06)',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(243,241,234,0.08)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginTop: 10,
+  },
+  targetHintText: {
+    fontSize: 12,
+    fontFamily: typography.fonts.body.regular,
+    color: colors.dark.mut,
+    lineHeight: 16,
+  },
   dateRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -330,8 +319,8 @@ const styles = StyleSheet.create({
     color: colors.dark.ink,
     marginTop: 2,
   },
-  dateChangeBtn: {
-    paddingHorizontal: 14,
+  dateChangeBadge: {
+    paddingHorizontal: 12,
     paddingVertical: 8,
     backgroundColor: 'rgba(243,241,234,0.10)',
     borderRadius: 10,

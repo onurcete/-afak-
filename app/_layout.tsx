@@ -26,8 +26,12 @@ export default function RootLayout() {
   });
 
   const hasCompletedOnboarding = useAppStore((state) => state.hasCompletedOnboarding);
+  const themeMode = useAppStore((state) => state.themeMode);
   const segments = useSegments();
   const router = useRouter();
+
+  const isDark = themeMode !== 'light';
+  const currentColors = isDark ? colors.dark : colors.light;
 
   useEffect(() => {
     initializePurchases();
@@ -62,12 +66,12 @@ export default function RootLayout() {
   }
 
   return (
-    <View style={styles.rootContainer}>
-      <StatusBar style="light" />
+    <View style={[styles.rootContainer, { backgroundColor: currentColors.bg }]}>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: colors.dark.bg },
+          contentStyle: { backgroundColor: currentColors.bg },
           animation: 'fade',
         }}
       >

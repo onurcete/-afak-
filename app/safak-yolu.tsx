@@ -1,5 +1,6 @@
 // app/safak-yolu.tsx
 // UI_SPEC.md: Şafak Yolu ekranı: üstte özet ("X şafak geçti, Y kaldı"), SafakYoluGrid ve alt detay kartı.
+// Günlük entegrasyonu: anı eklenen günlerde nokta rozeti, detay kartında anı görüntüleme/ekleme.
 
 import React, { useState } from 'react';
 import {
@@ -8,6 +9,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -19,6 +21,9 @@ import { calculateSafak, getCityDate, formatTurkishDate } from '../lib/date';
 import { SafakYoluGrid } from '../components/SafakYoluGrid';
 import { PlateBadge } from '../components/PlateBadge';
 import { getIlByPlaka, IlBilgisi } from '../constants/iller';
+import { useDiaryStore, SafakKaydi } from '../lib/diary';
+import { DiaryEntryModal } from '../components/DiaryEntryModal';
+import { DiaryDetailModal } from '../components/DiaryDetailModal';
 
 export default function SafakYoluScreen() {
   const router = useRouter();
@@ -31,6 +36,9 @@ export default function SafakYoluScreen() {
 
   const calculation = calculateSafak(startDate, endDate, new Date());
 
+  const entries = useDiaryStore((state) => state.entries);
+  const diaryPlakas = new Set(entries.map((e) => e.gunNo));
+
   // Başlangıçta seçili plaka: bugün 81 içindeyse bugünün plakası, değilse 81 (Düzce) veya 34 (İstanbul)
   const defaultPlaka =
     calculation.remainingDays >= 1 && calculation.remainingDays <= 81
@@ -40,6 +48,9 @@ export default function SafakYoluScreen() {
   const [selectedIl, setSelectedIl] = useState<IlBilgisi>(
     getIlByPlaka(defaultPlaka) || { plaka: 81, kod: '81', isim: 'Düzce' }
   );
+
+  const [isEntryModalVisible, setIsEntryModalVisible] = useState(false);
+  const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
 
   // Göreli gün konumu hesaplama ("3 gün sonra" / "bugün" / "5 gün önce")
   const getRelativePosition = (plaka: number) => {
@@ -69,10 +80,14 @@ export default function SafakYoluScreen() {
   const relativeText = getRelativePosition(selectedIl.plaka);
   const isToday = relativeText === strings.safakYolu.todayBadge;
 
+  // Gelecek gün kontrolü: Şafak 81'den 1'e doğru saydığı için plaka < remainingDays ise gelecektir
+  const isFuture = calculation.remainingDays > 0 && selectedIl.plaka < calculation.remainingDays;
+  const selectedDiaryEntry = entries.find((e) => e.gunNo === selectedIl.plaka);
+
   return (
     <View style={[styles.screen, { backgroundColor: currentColors.bg }]}>
       {/* Üst Başlık Çubuğu */}
-      <View style={styles.headerBar}>
+      <View style={[styles.headerBar, { borderBottomColor: currentColors.line }]}>
         <Text style={[styles.headerTitle, { color: currentColors.ink }]}>
           {strings.safakYolu.title}
         </Text>
@@ -81,7 +96,10 @@ export default function SafakYoluScreen() {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.back();
           }}
-          style={styles.closeBtn}
+          style={[
+            styles.closeBtn,
+            { backgroundColor: isDark ? 'rgba(243,241,234,0.06)' : '#E2E8F0' },
+          ]}
           accessibilityLabel={strings.safakYolu.closeButton}
         >
           <Text style={[styles.closeBtnText, { color: currentColors.mut }]}>✕</Text>
@@ -110,6 +128,7 @@ export default function SafakYoluScreen() {
             remainingDays={calculation.remainingDays}
             selectedPlaka={selectedIl.plaka}
             onSelectPlaka={(il) => setSelectedIl(il)}
+            diaryPlakas={diaryPlakas}
             isDark={isDark}
           />
         </View>
@@ -128,7 +147,7 @@ export default function SafakYoluScreen() {
                     styles.statusBadge,
                     {
                       backgroundColor: isToday
-                        ? currentColors.dawn
+                        ? currentColors.primaryBtnBg
                         : isDark
                         ? 'rgba(243,241,234,0.12)'
                         : 'rgba(0,0,0,0.06)',
@@ -138,7 +157,7 @@ export default function SafakYoluScreen() {
                   <Text
                     style={[
                       styles.statusBadgeText,
-                      { color: isToday ? '#101216' : currentColors.ink },
+                      { color: isToday ? currentColors.primaryBtnText : currentColors.ink },
                     ]}
                   >
                     {relativeText}
@@ -148,7 +167,7 @@ export default function SafakYoluScreen() {
             </View>
           </View>
 
-          <View style={styles.detailDivider} />
+          <View style={[styles.detailDivider, { backgroundColor: currentColors.line }]} />
 
           <View style={styles.detailCardBottom}>
             <Text style={[styles.dateSubLabel, { color: currentColors.mut }]}>
@@ -158,8 +177,97 @@ export default function SafakYoluScreen() {
               {formatTurkishDate(cityEstimatedDate)}
             </Text>
           </View>
+
+          {/* Günlük Anısı Bölümü */}
+          <View style={[styles.detailDivider, { backgroundColor: currentColors.line }]} />
+
+          <View style={styles.diarySection}>
+            {selectedDiaryEntry ? (
+              <View style={styles.diarySnippetRow}>
+                <View style={styles.diaryTextCol}>
+                  <View style={styles.diaryHeaderRow}>
+                    <Text style={[styles.diaryHeaderBadge, { color: currentColors.dawn }]}>
+                      ✍ {strings.diary.hasNoteBadge}
+                    </Text>
+                  </View>
+                  <Text
+                    style={[styles.diarySnippetText, { color: currentColors.ink }]}
+                    numberOfLines={2}
+                  >
+                    {selectedDiaryEntry.not || 'Fotoğraf anısı eklendi'}
+                  </Text>
+                </View>
+
+                {selectedDiaryEntry.fotoUri && (
+                  <Image
+                    source={{ uri: selectedDiaryEntry.fotoUri }}
+                    style={styles.diaryMiniThumb}
+                  />
+                )}
+
+                <TouchableOpacity
+                  style={[styles.diaryViewBtn, { backgroundColor: currentColors.primaryBtnBg }]}
+                  onPress={() => setIsDetailModalVisible(true)}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[styles.diaryViewBtnText, { color: currentColors.primaryBtnText }]}>
+                    İncele
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : isFuture ? (
+              <View
+                style={[
+                  styles.futureWarningBox,
+                  { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F1F5F9' },
+                ]}
+              >
+                <Text style={[styles.futureWarningText, { color: currentColors.mut }]}>
+                  🔒 {strings.diary.futureDayWarning}
+                </Text>
+              </View>
+            ) : (
+              <TouchableOpacity
+                style={[
+                  styles.addMemoryBtn,
+                  {
+                    borderColor: currentColors.line,
+                    backgroundColor: isDark ? 'rgba(255,214,176,0.06)' : '#FEF3C7',
+                  },
+                ]}
+                onPress={() => setIsEntryModalVisible(true)}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.addMemoryBtnText, { color: isDark ? currentColors.dawn : '#92400E' }]}>
+                  ✍ Bu Şafağa Not Düş ({selectedIl.isim})
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       </ScrollView>
+
+      {/* Günlük Ekleme Modalı */}
+      <DiaryEntryModal
+        visible={isEntryModalVisible}
+        gunNo={selectedIl.plaka}
+        tarih={cityEstimatedDate.toISOString().split('T')[0]}
+        plakaIl={selectedIl.isim}
+        onClose={() => setIsEntryModalVisible(false)}
+        isDark={isDark}
+      />
+
+      {/* Günlük Detay Modalı */}
+      <DiaryDetailModal
+        visible={isDetailModalVisible}
+        entry={selectedDiaryEntry}
+        onClose={() => setIsDetailModalVisible(false)}
+        onEdit={() => {
+          setIsDetailModalVisible(false);
+          setIsEntryModalVisible(true);
+        }}
+        isDark={isDark}
+      />
     </View>
   );
 }
@@ -176,7 +284,6 @@ const styles = StyleSheet.create({
     paddingTop: 54,
     paddingBottom: 14,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(243,241,234,0.08)',
   },
   headerTitle: {
     fontSize: 24,
@@ -189,7 +296,6 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(243,241,234,0.06)',
   },
   closeBtnText: {
     fontSize: 18,
@@ -252,7 +358,6 @@ const styles = StyleSheet.create({
   },
   detailDivider: {
     height: 1,
-    backgroundColor: 'rgba(243,241,234,0.08)',
     marginVertical: 14,
   },
   detailCardBottom: {
@@ -268,5 +373,65 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: typography.fonts.condensed.bold,
     letterSpacing: 0.5,
+  },
+  diarySection: {
+    marginTop: 2,
+  },
+  diarySnippetRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  diaryTextCol: {
+    flex: 1,
+  },
+  diaryHeaderRow: {
+    marginBottom: 4,
+  },
+  diaryHeaderBadge: {
+    fontSize: 12,
+    fontFamily: typography.fonts.body.semiBold,
+  },
+  diarySnippetText: {
+    fontSize: 13,
+    fontFamily: typography.fonts.body.regular,
+    lineHeight: 18,
+  },
+  diaryMiniThumb: {
+    width: 44,
+    height: 44,
+    borderRadius: 8,
+  },
+  diaryViewBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+  },
+  diaryViewBtnText: {
+    fontSize: 12,
+    fontFamily: typography.fonts.condensed.bold,
+  },
+  futureWarningBox: {
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+  },
+  futureWarningText: {
+    fontSize: 12,
+    fontFamily: typography.fonts.body.regular,
+    textAlign: 'center',
+    lineHeight: 16,
+  },
+  addMemoryBtn: {
+    height: 44,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addMemoryBtnText: {
+    fontSize: 14,
+    fontFamily: typography.fonts.condensed.bold,
   },
 });

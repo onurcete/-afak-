@@ -8,7 +8,11 @@
     "scheme": "safakplus",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Şafak günlüğünüze askerlik anısı fotoğrafı çekip eklemek için kamera erişimi gereklidir.",
+        "NSPhotoLibraryUsageDescription": "Şafak günlüğünüze galerinizden fotoğraf seçip eklemek için galeri erişimi gereklidir."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -34,7 +38,14 @@
         }
       ],
       "expo-sharing",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Şafak günlüğünüze galerinizden fotoğraf seçip eklemek için galeri erişimi gereklidir.",
+          "cameraPermission": "Şafak günlüğünüze askerlik anısı fotoğrafı çekip eklemek için kamera erişimi gereklidir."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

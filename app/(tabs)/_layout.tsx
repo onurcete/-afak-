@@ -1,20 +1,29 @@
-// app/(tabs)/_layout.tsx
-// UI_SPEC.md: Ana sekmeler: Ana Ekran (Şafak) ve Ayarlar
-
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Text, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { colors } from '../../constants/colors';
 import { typography } from '../../constants/typography';
+import { useAppStore } from '../../lib/storage';
+import { TabIconSafak, TabIconDiary, TabIconSettings } from '../../components/TabIcons';
 
 export default function TabLayout() {
+  const themeMode = useAppStore((state) => state.themeMode);
+  const isDark = themeMode !== 'light';
+  const currentColors = isDark ? colors.dark : colors.light;
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: styles.tabBar,
-        tabBarActiveTintColor: colors.dark.dawn,
-        tabBarInactiveTintColor: colors.dark.mut,
+        tabBarStyle: [
+          styles.tabBar,
+          {
+            backgroundColor: isDark ? colors.dark.bgBottom : '#FFFFFF',
+            borderTopColor: currentColors.line,
+          },
+        ],
+        tabBarActiveTintColor: isDark ? currentColors.dawn : '#0F172A',
+        tabBarInactiveTintColor: currentColors.mut,
         tabBarLabelStyle: styles.tabBarLabel,
       }}
     >
@@ -23,8 +32,33 @@ export default function TabLayout() {
         options={{
           title: 'Şafak',
           tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.tabIconBadge, focused && styles.tabIconBadgeFocused]}>
-              <Text style={[styles.tabIconText, { color }]}>🇹🇷</Text>
+            <View
+              style={[
+                styles.tabIconBadge,
+                focused && {
+                  backgroundColor: isDark ? 'rgba(255,214,176,0.15)' : 'rgba(15, 23, 42, 0.08)',
+                },
+              ]}
+            >
+              <TabIconSafak color={color} focused={focused} size={22} />
+            </View>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="diary"
+        options={{
+          title: 'Günlük',
+          tabBarIcon: ({ color, focused }) => (
+            <View
+              style={[
+                styles.tabIconBadge,
+                focused && {
+                  backgroundColor: isDark ? 'rgba(255,214,176,0.15)' : 'rgba(15, 23, 42, 0.08)',
+                },
+              ]}
+            >
+              <TabIconDiary color={color} focused={focused} size={22} />
             </View>
           ),
         }}
@@ -34,8 +68,15 @@ export default function TabLayout() {
         options={{
           title: 'Ayarlar',
           tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.tabIconBadge, focused && styles.tabIconBadgeFocused]}>
-              <Text style={[styles.tabIconSettings, { color }]}>⚙</Text>
+            <View
+              style={[
+                styles.tabIconBadge,
+                focused && {
+                  backgroundColor: isDark ? 'rgba(255,214,176,0.15)' : 'rgba(15, 23, 42, 0.08)',
+                },
+              ]}
+            >
+              <TabIconSettings color={color} focused={focused} size={22} />
             </View>
           ),
         }}
@@ -46,8 +87,6 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: colors.dark.bgBottom,
-    borderTopColor: colors.dark.line,
     borderTopWidth: 1,
     height: 64,
     paddingBottom: 8,

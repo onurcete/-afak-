@@ -26,13 +26,15 @@ export interface UserState {
   reset: () => void;
 }
 
-// Varsayılan tarihler: 6 ay sonrası için örnek başlangıç
+// Varsayılan tarihler: 2 ay önce sülüs, 4 ay sonra tezkere (gerçekçi askerlik akışı)
 const getInitialDates = () => {
   const now = new Date();
+  const start = new Date(now);
+  start.setMonth(start.getMonth() - 2);
   const end = new Date(now);
-  end.setMonth(end.getMonth() + 6);
+  end.setMonth(end.getMonth() + 4);
   return {
-    start: now.toISOString(),
+    start: start.toISOString(),
     end: end.toISOString(),
   };
 };
@@ -54,14 +56,18 @@ export const useAppStore = create<UserState>()(
       setThemeMode: (themeMode) => set({ themeMode }),
       setCompletedOnboarding: (hasCompletedOnboarding) => set({ hasCompletedOnboarding }),
       setIsPro: (isPro) => set({ isPro }),
-      reset: () =>
+      reset: () => {
+        const dates = getInitialDates();
         set({
           hasCompletedOnboarding: false,
+          startDate: dates.start,
+          endDate: dates.end,
           targetPerson: 'self',
           safak81Mode: true,
           themeMode: 'dark',
           isPro: false,
-        }),
+        });
+      },
     }),
     {
       name: 'safak-plus-storage',

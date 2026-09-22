@@ -90,7 +90,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
       <View style={styles.overlay}>
         <View style={[styles.modalCard, { backgroundColor: currentColors.bg }]}>
           {/* Başlık Çubuğu */}
-          <View style={styles.headerBar}>
+          <View style={[styles.headerBar, { borderBottomColor: currentColors.line }]}>
             <Text style={[styles.headerTitle, { color: currentColors.ink }]}>
               {strings.share.modalTitle}
             </Text>
@@ -120,23 +120,28 @@ export const ShareModal: React.FC<ShareModalProps> = ({
 
           {/* Aksiyon Butonu */}
           <View style={styles.bottomBar}>
-            <TouchableOpacity
-              style={[
-                styles.shareActionBtn,
-                { backgroundColor: currentColors.dawn },
-              ]}
-              onPress={handleShare}
-              disabled={isCapturing}
-              activeOpacity={0.8}
-            >
-              {isCapturing ? (
-                <ActivityIndicator color="#101216" />
-              ) : (
-                <Text style={styles.shareActionBtnText}>
-                  {strings.share.shareSheetButton}
-                </Text>
-              )}
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.shareActionBtn,
+                  { backgroundColor: currentColors.primaryBtnBg },
+                ]}
+                onPress={handleShare}
+                disabled={isCapturing}
+                activeOpacity={0.8}
+              >
+                {isCapturing ? (
+                  <ActivityIndicator color={currentColors.primaryBtnText} />
+                ) : (
+                  <Text
+                    style={[
+                      styles.shareActionBtnText,
+                      { color: currentColors.primaryBtnText },
+                    ]}
+                  >
+                    {strings.share.shareSheetButton}
+                  </Text>
+                )}
+              </TouchableOpacity>
           </View>
         </View>
       </View>

@@ -15,6 +15,7 @@ interface SafakYoluGridProps {
   remainingDays: number;
   selectedPlaka: number;
   onSelectPlaka: (il: IlBilgisi) => void;
+  diaryPlakas?: Set<number>;
   isDark?: boolean;
 }
 
@@ -22,6 +23,7 @@ export const SafakYoluGrid: React.FC<SafakYoluGridProps> = ({
   remainingDays,
   selectedPlaka,
   onSelectPlaka,
+  diaryPlakas,
   isDark = true,
 }) => {
   const currentColors = isDark ? colors.dark : colors.light;
@@ -61,6 +63,7 @@ export const SafakYoluGrid: React.FC<SafakYoluGridProps> = ({
         const status = getCellStatus(il.plaka);
         const isSelected = il.plaka === selectedPlaka;
         const statusLabel = getStatusLabel(status);
+        const hasDiary = diaryPlakas?.has(il.plaka);
 
         let cellBg: string = 'transparent';
         let cellBorder: string = currentColors.line;
@@ -72,7 +75,7 @@ export const SafakYoluGrid: React.FC<SafakYoluGridProps> = ({
         } else if (status === 'today') {
           cellBg = currentColors.dawn;
           cellBorder = currentColors.dawn;
-          textColor = '#101216';
+          textColor = isDark ? '#101216' : '#FFFFFF';
         } else {
           // future
           cellBorder = isDark ? 'rgba(243,241,234,0.22)' : 'rgba(16,19,26,0.20)';
@@ -114,6 +117,21 @@ export const SafakYoluGrid: React.FC<SafakYoluGridProps> = ({
             >
               {il.kod}
             </Text>
+
+            {/* Anı Noktası (Diary Dot Indicator) */}
+            {hasDiary && (
+              <View
+                style={[
+                  styles.diaryDot,
+                  {
+                    backgroundColor:
+                      status === 'today'
+                        ? (isDark ? '#101216' : '#FFFFFF')
+                        : currentColors.dawn,
+                  },
+                ]}
+              />
+            )}
           </TouchableOpacity>
         );
       })}
@@ -137,10 +155,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     margin: 2.5,
+    position: 'relative',
   },
   cellText: {
     fontSize: 13,
     includeFontPadding: false,
     fontVariant: ['tabular-nums'],
+  },
+  diaryDot: {
+    position: 'absolute',
+    top: 2.5,
+    right: 2.5,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
   },
 });
