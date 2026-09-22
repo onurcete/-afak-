@@ -10,10 +10,10 @@ Aşağıdaki adımları sırayla tamamlayarak uygulamanızı App Store ve Google
 
 ---
 
-### 2. Gizlilik Politikası & Yasal Linkler
-- [ ] Notion, GitHub Pages veya ücretsiz bir web sayfasında basit bir **Gizlilik Politikası** sayfası oluştur.
-  - *İçerikte:* Kamera ve galerinin sadece kullanıcının anı fotoğrafı eklemesi için kullanıldığı, hiçbir verinin dışarı aktarılmadığı yerel saklandığı belirtilmeli.
-- [ ] Bu sayfanın linkini `app/(tabs)/settings.tsx` içindeki `https://safakplus.app/privacy` alanına yerleştir.
+### 2. Gizlilik Politikası & Yasal Linkler (HAZIRLANDI ✓)
+- [x] **Gizlilik Politikası & Kullanım Koşulları** `docs/index.html` ve `docs/terms.html` olarak oluşturuldu ve `app/(tabs)/settings.tsx` içine bağlandı.
+- [ ] **GitHub Pages'i Aç:** GitHub'da reponuza gidin: **Settings > Pages > Build and deployment > Branch: `main` / `docs`** seçip **Save** deyin.
+  - Canlı adresiniz: `https://onurcete.github.io/-afak-/` olacak.
 
 ---
 

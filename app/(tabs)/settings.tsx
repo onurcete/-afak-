@@ -548,7 +548,7 @@ export default function SettingsScreen() {
           </Text>
           <View style={styles.policyLinksRow}>
             <TouchableOpacity
-              onPress={() => Linking.openURL('https://safakplus.app/privacy')}
+              onPress={() => Linking.openURL('https://onurcete.github.io/-afak-/')}
             >
               <Text style={[styles.privacyLink, { color: currentColors.dawn }]}>
                 {strings.settings.privacyPolicy}
@@ -556,7 +556,7 @@ export default function SettingsScreen() {
             </TouchableOpacity>
             <Text style={{ color: currentColors.line }}>•</Text>
             <TouchableOpacity
-              onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}
+              onPress={() => Linking.openURL('https://onurcete.github.io/-afak-/terms.html')}
             >
               <Text style={[styles.privacyLink, { color: currentColors.dawn }]}>
                 {strings.settings.termsOfService}

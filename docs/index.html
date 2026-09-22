@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Şafak+ — Gizlilik Politikası & Kullanım Koşulları</title>
+  <style>
+    :root {
+      --bg: #0F172A;
+      --card-bg: #1E293B;
+      --text: #F8FAFC;
+      --text-muted: #94A3B8;
+      --primary: #F59E0B;
+      --border: #334155;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      padding: 36px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 24px;
+      margin-bottom: 28px;
+    }
+    .badge {
+      display: inline-block;
+      background: var(--primary);
+      color: #000;
+      font-weight: 800;
+      font-size: 14px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    .update-date {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    nav {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+    }
+    nav a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    h2 {
+      font-size: 20px;
+      margin-top: 32px;
+      margin-bottom: 12px;
+      color: var(--text);
+      border-left: 4px solid var(--primary);
+      padding-left: 10px;
+    }
+    p, ul {
+      color: var(--text-muted);
+      font-size: 15px;
+      margin-bottom: 16px;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+    .highlight-box {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 16px;
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+    .highlight-box p {
+      color: var(--text);
+      margin: 0;
+    }
+    footer {
+      margin-top: 40px;
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="badge">ŞAFAK+</div>
+    <h1>Gizlilik Politikası (Privacy Policy)</h1>
+    <p class="update-date">Son Güncelleme: 22 Eylül 2026</p>
+    <nav>
+      <a href="#gizlilik">Gizlilik Politikası</a>
+      <a href="terms.html">Kullanım Koşulları (Terms of Use)</a>
+    </nav>
+  </header>
+
+  <div class="highlight-box">
+    <p><strong>Özet:</strong> Şafak+ uygulaması kullanıcı hesabı (üyelik) oluşturmaz, kişisel verilerinizi sunuculara toplamaz veya satmaz. Tüm şafak ve günlük anılarınız yalnızca kendi cihazınızda yerel olarak saklanır.</p>
+  </div>
+
+  <section id="gizlilik">
+    <h2>1. Veri Toplama ve İşleme</h2>
+    <p>Şafak+ uygulaması, kullanıcıların gizliliğine azami saygı göstermek üzere tasarlanmıştır:</p>
+    <ul>
+      <li><strong>Üyelik / Hesap Bilgileri:</strong> Uygulama herhangi bir kayıt, e-posta veya şifre gerektirmez. Hesap oluşturma mekanizması bulunmamaktadır.</li>
+      <li><strong>Askerlik Tarihleri:</strong> Girdiğiniz katılış ve tezkere tarihleri yalnızca cihazınızın hafızasında yerel olarak saklanır, hiçbir harici sunucuya iletilmez.</li>
+      <li><strong>Şafak Günlüğü ve Notlar:</strong> Yazdığınız anılar ve nöbet notları cihazınızın dosya sisteminde <code>safak_diary.json</code> olarak yerel tutulur.</li>
+    </ul>
+
+    <h2>2. Kamera ve Fotoğraf Galerisi İzinleri</h2>
+    <p>Uygulamamızdaki "Şafak Günlüğü" özelliği kapsamında askerlik anısı ekleyebilmeniz için cihazınızdan şu izinler talep edilebilir:</p>
+    <ul>
+      <li><strong>Kamera (NSCameraUsageDescription):</strong> Anı defterinize anlık fotoğraf çekip ekleyebilmeniz için kullanılır.</li>
+      <li><strong>Fotoğraf Galerisi (NSPhotoLibraryUsageDescription):</strong> Galerinizden anı fotoğrafı seçebilmeniz için kullanılır.</li>
+    </ul>
+    <p>Bu fotoğraflar cihazınız içinde otomatik olarak optimize edilir ve yalnızca cihazınızın kendi yerel dizininde tutulur. Fotoğraflarınız hiçbir bulut sunucusuna veya üçüncü şahıslara aktarılmaz.</p>
+
+    <h2>3. Uygulama İçi Satın Alımlar (Şafak+ Pro)</h2>
+    <p>Uygulamamızda tek seferlik isteğe bağlı "Şafak+ Pro" paketi bulunmaktadır:</p>
+    <ul>
+      <li>Ödeme ve faturalandırma işlemleri <strong>Apple App Store (StoreKit)</strong> ve <strong>Google Play Billing</strong> altyapıları üzerinden güvence altındadır.</li>
+      <li>Kredi kartı veya banka bilgileriniz geliştirici tarafından asla görülmez ve saklanmaz.</li>
+      <li>Satın alma durumunun doğrulanması ve "Satın Alımları Geri Yükle" özelliğinin çalışması amacıyla RevenueCat altyapısı kullanılmaktadır. Bu süreçte yalnızca anonim bir cihaz belirteci kullanılır.</li>
+    </ul>
+
+    <h2>4. Verilerin Silinmesi (Uygulamayı Sıfırlama)</h2>
+    <p>Cihazınızda kayıtlı tüm verileri (tarihler, tercihler, günlük anıları ve fotoğraflar) silmek istediğinizde, uygulamanın <strong>Ayarlar &gt; 🗑️ Uygulamayı Sıfırla</strong> butonuna basabilirsiniz. Bu işlem cihazınızdaki tüm yerel kayıtları kalıcı olarak temizler.</p>
+
+    <h2>5. Resmî Kurum Feragati</h2>
+    <div class="highlight-box">
+      <p><strong>Yasal Bilgilendirme:</strong> Şafak+ uygulaması bağımsız bir geliştirici tarafından hazırlanmıştır. Millî Savunma Bakanlığı (MSB), Türk Silahlı Kuvvetleri (TSK) veya herhangi bir resmî devlet kurumu ile doğrudan veya dolaylı hiçbir resmî bağı bulunmamaktadır. Hesaplanan terhis tarihleri tamamen kullanıcı tarafından girilen tarihlere dayanır.</p>
+    </div>
+
+    <h2>6. İletişim</h2>
+    <p>Gizlilik politikamız veya uygulamayla ilgili her türlü soru, öneri ve destek talebiniz için bizimle iletişime geçebilirsiniz:</p>
+    <p><strong>E-posta:</strong> <a href="mailto:ceteonur@gmail.com" style="color: var(--primary);">ceteonur@gmail.com</a></p>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 Şafak+. Tüm hakları saklıdır.</p>
+  </footer>
+</div>
+
+</body>
+</html>
