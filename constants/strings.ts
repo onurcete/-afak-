@@ -163,6 +163,7 @@ export const strings = {
       'Şafak+ uygulaması resmî bir askerlik şubesi veya Millî Savunma Bakanlığı uygulaması değildir. Hesaplanan tezkere ve kalan gün verileri tamamen kullanıcı girdisine ve tahmine dayanır.',
     version: 'Sürüm 1.0.0',
     privacyPolicy: 'Gizlilik Politikası',
+    termsOfService: 'Kullanım Koşulları (EULA)',
   },
 
   // Erişilebilirlik (Accessibility)

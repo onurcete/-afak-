@@ -546,13 +546,23 @@ export default function SettingsScreen() {
           <Text style={[styles.versionText, { color: currentColors.mut }]}>
             {strings.settings.version}
           </Text>
-          <TouchableOpacity
-            onPress={() => Linking.openURL('https://safakplus.app/privacy')}
-          >
-            <Text style={[styles.privacyLink, { color: currentColors.dawn }]}>
-              {strings.settings.privacyPolicy}
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.policyLinksRow}>
+            <TouchableOpacity
+              onPress={() => Linking.openURL('https://safakplus.app/privacy')}
+            >
+              <Text style={[styles.privacyLink, { color: currentColors.dawn }]}>
+                {strings.settings.privacyPolicy}
+              </Text>
+            </TouchableOpacity>
+            <Text style={{ color: currentColors.line }}>•</Text>
+            <TouchableOpacity
+              onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}
+            >
+              <Text style={[styles.privacyLink, { color: currentColors.dawn }]}>
+                {strings.settings.termsOfService}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
@@ -810,5 +820,10 @@ const styles = StyleSheet.create({
   privacyLink: {
     fontSize: 12,
     fontFamily: typography.fonts.body.medium,
+  },
+  policyLinksRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
 });
