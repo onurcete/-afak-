@@ -2,13 +2,16 @@
 // AGENT.md: RevenueCat (react-native-purchases) ile tek seferlik non-consumable satın alma.
 
 import { Platform } from 'react-native';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
 
 // RevenueCat entitlement ID ve API anahtarları
 export const REVENUECAT_ENTITLEMENT_ID = 'pro_access';
 const API_KEYS = {
-  ios: 'appl_mock_placeholder_key',
-  android: 'goog_mock_placeholder_key',
+  ios: 'test_wJNfTmNqRpVGWoWdEZaxHYiFhMC',
+  android: 'test_wJNfTmNqRpVGWoWdEZaxHYiFhMC',
 };
+
+const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
 
 let Purchases: any = null;
 try {
@@ -19,27 +22,26 @@ try {
 }
 
 export async function initializePurchases(): Promise<void> {
-  if (!Purchases || Platform.OS === 'web') {
+  if (!Purchases || Platform.OS === 'web' || isExpoGo) {
+    if (isExpoGo) {
+      console.log('[RevenueCat] Expo Go tespit edildi. Yerel IAP native modülü standalone derlemede aktifleşir.');
+    }
     return;
   }
 
   const apiKey = Platform.OS === 'ios' ? API_KEYS.ios : API_KEYS.android;
-  // Yer tutucu (placeholder) anahtar varsa hata fırlatmasını önle
-  if (apiKey.includes('mock_placeholder') || apiKey.includes('placeholder')) {
-    console.log('[RevenueCat] Geliştirme/Placeholder anahtarı algılandı. Gerçek IAP başlatma atlandı.');
-    return;
-  }
 
   try {
     Purchases.setLogLevel(Purchases.LOG_LEVEL.DEBUG);
     await Purchases.configure({ apiKey });
+    console.log('[RevenueCat] Başarıyla yapılandırıldı.');
   } catch (error) {
     console.warn('[RevenueCat] Initialization warning:', error);
   }
 }
 
 export async function checkProStatus(): Promise<boolean> {
-  if (!Purchases) {
+  if (!Purchases || Platform.OS === 'web' || isExpoGo) {
     return false;
   }
 
@@ -53,9 +55,12 @@ export async function checkProStatus(): Promise<boolean> {
 }
 
 export async function restorePurchases(): Promise<{ success: boolean; isPro: boolean; message?: string }> {
-  const apiKey = Platform.OS === 'ios' ? API_KEYS.ios : API_KEYS.android;
-  if (!Purchases || apiKey.includes('placeholder') || Platform.OS === 'web') {
-    return { success: true, isPro: true, message: 'Geliştirme modunda Pro durumu simüle edildi.' };
+  if (!Purchases || Platform.OS === 'web' || isExpoGo) {
+    return {
+      success: true,
+      isPro: true,
+      message: isExpoGo ? 'Expo Go ortamında Pro simüle edildi.' : 'Geliştirme modunda Pro durumu simüle edildi.',
+    };
   }
 
   try {
@@ -68,9 +73,12 @@ export async function restorePurchases(): Promise<{ success: boolean; isPro: boo
 }
 
 export async function purchasePro(): Promise<{ success: boolean; isPro: boolean; message?: string }> {
-  const apiKey = Platform.OS === 'ios' ? API_KEYS.ios : API_KEYS.android;
-  if (!Purchases || apiKey.includes('placeholder') || Platform.OS === 'web') {
-    return { success: true, isPro: true, message: 'Geliştirme modunda Pro satın alımı simüle edildi.' };
+  if (!Purchases || Platform.OS === 'web' || isExpoGo) {
+    return {
+      success: true,
+      isPro: true,
+      message: isExpoGo ? 'Expo Go ortamında Pro satın alımı simüle edildi.' : 'Geliştirme modunda Pro satın alımı simüle edildi.',
+    };
   }
 
   try {
