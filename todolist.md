@@ -26,10 +26,11 @@ Aşağıdaki adımları sırayla tamamlayarak uygulamanızı App Store ve Google
 
 ---
 
-### 4. Şafak+ Pro Satın Alma (RevenueCat API Anahtarı Eklendi ✓)
-- [x] [RevenueCat](https://www.revenuecat.com) projesi açıldı ve API anahtarı (`test_wJNf...`) `lib/iap.ts` dosyasına başarıyla entegre edildi.
-- [ ] RevenueCat panelinde **Entitlements > + New** diyerek `pro_access` hakkını oluştur.
-- [ ] **App Store Connect & Google Play Console** açıldığında *In-App Purchase* ürünü olarak `safakplus_pro_lifetime` tanımlanacak.
+### 4. Şafak+ Pro Satın Alma (RevenueCat TAMAMLANDI ✓)
+- [x] RevenueCat projesi açıldı ve API anahtarı `lib/iap.ts` dosyasına entegre edildi.
+- [x] RevenueCat üzerinde `safakplus_pro_lifetime` ürünü Non-consumable olarak oluşturuldu.
+- [x] `pro_access` hakkı (entitlement) ve `default` paketi eşleştirildi.
+- [ ] *İleride mağazalar açıldığında:* App Store Connect ve Google Play Console'a girip aynı ID ile (`safakplus_pro_lifetime`) ürün oluşturulacak.
 
 ---
 
